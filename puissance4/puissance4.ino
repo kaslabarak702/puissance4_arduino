@@ -36,34 +36,42 @@ class Pion {
 };
 
 
-const int GRILLE_TAILLEY = 7;
-const int GRILLE_TAILLEX = 6;
-int grille[GRILLE_TAILLEX][GRILLE_TAILLEY] = {{1, 1, 1, 1, 1, 1, 1}, {1, 1, 1, 1, 1, 1}};
+const int LIGNES_GRILLE = 7; // Taille de la grille (7 colonnes x 6 lignes)
+const int COLONNES_GRILLE = 6;
+const int TAILLE_CELLULE = 8; // Taille d'une cellule de la grille
 
+const int LARGEUR_ECRAN = gb.display.width();
+const int HAUTEUR_ECRAN = gb.display.height();
 
-float ligne_hauteur = 2;
-float ligne_largeur = 50;
+const int DECALAGE_GRILLE_X = 0; // Décalage horizontal de la grille
+const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.2; // Décalage vertical de la grille
 
-float colonne_hauteur = 5;
-float colonne_largeur = 2;
+const int LARGEUR_GRILLE = COLONNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
+const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la grille
+
+void dessinerGrille() {
+  gb.display.clear();
+
+  // Dessin de la grille
+  for (int i = 0; i < LIGNES_GRILLE; i++) {
+    for (int j = 0; j < COLONNES_GRILLE; j++) {
+      int xCellule = DECALAGE_GRILLE_X + i * TAILLE_CELLULE;
+      int yCellule = DECALAGE_GRILLE_Y + j * TAILLE_CELLULE;
+
+      gb.display.drawRect(xCellule, yCellule, TAILLE_CELLULE, TAILLE_CELLULE);
+    }
+  }
+}
 
 void setup() {
-  // put your setup code here, to run once:
   gb.begin();
+  
 }
 
 void loop() {
-//tant que gagner == false
-//Verif cases jouable (colonne vide, 
-  
-  while (!gb.update());
-  gb.display.clear();
-
-  gb.display.setColor(WHITE);
-
-  for (int x = 0; x < GRILLE_TAILLEX +1; x += 1){
-    
-    int displayY = x * (colonne_largeur + 6) + 1;
-    gb.display.fillRect(ligne_largeur, displayY, ligne_largeur, ligne_hauteur);
+  if (gb.update()) {
+    dessinerGrille();
+    dessinerPions();
   }
 }
+
