@@ -49,6 +49,11 @@ const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.2; // Décalage vertical de la g
 const int LARGEUR_GRILLE = LIGNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
 const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la grille
 
+int indexCurseur = 0;
+int valeurCurseur = 1;
+int curseurX = 4;
+int curseurY = 2;
+
 void dessinerGrille() {
   gb.display.clear();
 
@@ -63,16 +68,39 @@ void dessinerGrille() {
   }
 }
 
-
-
 void setup() {
   gb.begin();
 }
 
 void loop() {
-  if (gb.update()) {
-    dessinerGrille();
-    //dessinerPions();
+  while (!gb.update());
+  dessinerGrille();
+  //dessinerPions();
+
+  tourJouer();
+}
+
+void tourJouer() {
+  //gb.display.clear();
+  
+  int colonnesJouables[7] = {1, 2, 3, 4, 5, 6, 7};
+  int tailleColonnesJouable = 7;
+
+  if((gb.buttons.pressed(BUTTON_LEFT)) && indexCurseur - 1 >= 0){
+    indexCurseur -= 1;
   }
+  if((gb.buttons.pressed(BUTTON_RIGHT)) && indexCurseur < tailleColonnesJouable-1){
+    indexCurseur += 1;
+  }
+  valeurCurseur = colonnesJouables[indexCurseur];
+  
+  dessinerCurseur();
+}
+
+void dessinerCurseur(){
+  // Dessin du curseur
+  gb.display.print(valeurCurseur);
+  float xCellule = valeurCurseur * TAILLE_CELLULE - TAILLE_CELLULE/2 - curseurX/2;
+  gb.display.drawRect(xCellule, 4, curseurX, curseurY);
 }
 
