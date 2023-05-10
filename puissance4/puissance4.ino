@@ -1,5 +1,46 @@
 #include <Gamebuino-Meta.h>
 
+// Déclaration de la classe Pion
+class Pion {
+  private:
+    int coordonnee_i; // Coordonnée i du pion
+    int coordonnee_j; // Coordonnée j du pion
+    int numero_joueur; // Numéro du joueur associé au pion
+    
+  public:
+    // Constructeur
+    Pion(int i, int j, int joueur) {
+      coordonnee_i = i;
+      coordonnee_j = j;
+      numero_joueur = joueur;
+    }
+    
+    // Méthode pour obtenir la coordonnée i du pion
+    int getCoordonneeI() {
+      return coordonnee_i;
+    }
+    
+    // Méthode pour obtenir la coordonnée j du pion
+    int getCoordonneeJ() {
+      return coordonnee_j;
+    }
+    
+    // Méthode pour définir les coordonnées i et j du pion
+    void setCoordonnees(int i, int j) {
+      coordonnee_i = i;
+      coordonnee_j = j;
+    }
+    
+    // Méthode pour obtenir le numéro du joueur associé au pion
+    int getNumeroJoueur() {
+      return numero_joueur;
+    }
+    
+    // Méthode pour définir le numéro du joueur associé au pion
+    void setNumeroJoueur(int joueur) {
+      numero_joueur = joueur;
+    }
+};
 
 
 const int GRILLE_TAILLEY = 7;
