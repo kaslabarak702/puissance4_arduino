@@ -36,8 +36,8 @@ class Pion {
 };
 
 
-const int LIGNES_GRILLE = 7; // Taille de la grille (7 colonnes x 6 lignes)
-const int COLONNES_GRILLE = 6;
+const int COLONNES_GRILLE = 7; // Taille de la grille (7 colonnes x 6 lignes)
+const int LIGNES_GRILLE = 6;
 const int TAILLE_CELLULE = 8; // Taille d'une cellule de la grille
 
 const int LARGEUR_ECRAN = gb.display.width();
@@ -46,15 +46,15 @@ const int HAUTEUR_ECRAN = gb.display.height();
 const int DECALAGE_GRILLE_X = 0; // Décalage horizontal de la grille
 const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.2; // Décalage vertical de la grille
 
-const int LARGEUR_GRILLE = COLONNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
+const int LARGEUR_GRILLE = LIGNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
 const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la grille
 
 void dessinerGrille() {
   gb.display.clear();
 
   // Dessin de la grille
-  for (int i = 0; i < LIGNES_GRILLE; i++) {
-    for (int j = 0; j < COLONNES_GRILLE; j++) {
+  for (int i = 0; i < COLONNES_GRILLE; i++) {
+    for (int j = 0; j < LIGNES_GRILLE; j++) {
       int xCellule = DECALAGE_GRILLE_X + i * TAILLE_CELLULE;
       int yCellule = DECALAGE_GRILLE_Y + j * TAILLE_CELLULE;
 
@@ -63,15 +63,16 @@ void dessinerGrille() {
   }
 }
 
+
+
 void setup() {
   gb.begin();
-  
 }
 
 void loop() {
   if (gb.update()) {
     dessinerGrille();
-    dessinerPions();
+    //dessinerPions();
   }
 }
 
