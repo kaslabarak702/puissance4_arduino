@@ -2,8 +2,8 @@
 
 class Pion {
   private:
-    int coordonnee_i; // Coordonnée i du pion
-    int coordonnee_j; // Coordonnée j du pion
+    int coordonnee_i; // Coordonnée abscisse du pion
+    int coordonnee_j; // Coordonnée ordonnée du pion
     int numero_joueur; // Numéro du joueur associé au pion
     
   public:
