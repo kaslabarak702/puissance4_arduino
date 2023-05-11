@@ -129,7 +129,7 @@
        uneTrouvee=false;
     }
     /* TODO DEBUG SUPPRIMER*/ 
-    /*for (int i = 0; i < nombreCasesJouables; i++) {
+    for (int i = 0; i < nombreCasesJouables; i++) {
       int x = casesJouables[i][0];
       int y = casesJouables[i][1];
       
@@ -138,7 +138,7 @@
       gb.display.print(":");
       gb.display.print(y);
       gb.display.print("/");
-    }*/
+    }
     
    // Libération de la mémoire allouée pour casesJouables
     for (int i = 0; i < nombreCasesJouables; i++) {
@@ -177,22 +177,33 @@ void loop() {
 }
 
 int indexCurseur = 0;
-int valeurCurseur = 1;
+int valeurCurseur = 0;
 int curseurX = 4;
 int curseurY = 2;
 
 void tourJouer() {
- 
-  int colonnesJouables[7] = {1, 2, 3, 4, 5, 6, 7};
+  //gb.display.clear();
+  
+  int** colonnesJouables = chercherCaseJouable();
   int tailleColonnesJouable = 7;
 
-  if((gb.buttons.pressed(BUTTON_LEFT)) && indexCurseur - 1 >= 0){
+  if((gb.buttons.pressed(BUTTON_LEFT)) && indexCurseur > 0){
     indexCurseur -= 1;
   }
-  if((gb.buttons.pressed(BUTTON_RIGHT)) && indexCurseur < tailleColonnesJouable-1){
+  if((gb.buttons.pressed(BUTTON_RIGHT)) && indexCurseur < tailleColonnesJouable && indexCurseur > 0){
     indexCurseur += 1;
   }
-  valeurCurseur = colonnesJouables[indexCurseur];
+  valeurCurseur = colonnesJouables[indexCurseur][0];
+
+  if((gb.buttons.pressed(BUTTON_A)) && (indexCurseur < tailleColonnesJouable) && (indexCurseur < tailleColonnesJouable)){
+    for(int i = LIGNES_GRILLE; i>=0; i--){
+      if(grillePions[i][valeurCurseur].getNumeroJoueur() == -1){
+        grillePions[i][valeurCurseur] = Pion(i,valeurCurseur,1);
+        dessinerPions();
+        break;
+      }
+    }
+  }
   
   dessinerCurseur();
 }
@@ -201,8 +212,8 @@ void tourJouer() {
 
 void dessinerCurseur(){
   // Dessin du curseur
-  //gb.display.println(valeurCurseur);
-  float xCellule = valeurCurseur * TAILLE_CELLULE - TAILLE_CELLULE/2 - curseurX/2;
+  gb.display.println(valeurCurseur);
+  float xCellule = valeurCurseur * TAILLE_CELLULE + TAILLE_CELLULE/2 - curseurX/2;
   gb.display.drawRect(xCellule, 4, curseurX, curseurY);
 }
 
