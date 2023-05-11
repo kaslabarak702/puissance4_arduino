@@ -2,34 +2,34 @@
   
   class Pion {
     private:
-      int coordonnee_i; // Coordonnée abscisse du pion
-      int coordonnee_j; // Coordonnée ordonnée du pion
+      int colonne; // Coordonnée abscisse du pion dans la grille
+      int ligne; // Coordonnée ordonnée du pion dans la grille
       int numero_joueur; // Numéro du joueur associé au pion
       
     public:
       Pion() {
-        coordonnee_i = 0;
-        coordonnee_j = 0;
+        colonne = 0;
+        ligne = 0;
         numero_joueur = -1;
       }
     
       Pion(int i, int j, int joueur) {
-        coordonnee_i = i;
-        coordonnee_j = j;
+        colonne = i;
+        ligne = j;
         numero_joueur = joueur;
       }
       
       int getCoordonneeI() {
-        return coordonnee_i;
+        return colonne;
       }
       
       int getCoordonneeJ() {
-        return coordonnee_j;
+        return ligne;
       }
       
       void setCoordonnees(int i, int j) {
-        coordonnee_i = i;
-        coordonnee_j = j;
+        colonne = i;
+        ligne = j;
       }
       
       int getNumeroJoueur() {
