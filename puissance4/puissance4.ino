@@ -70,9 +70,7 @@
         gb.display.drawRect(xCellule, yCellule, TAILLE_CELLULE, TAILLE_CELLULE);
       }
     }
-
- 
-};
+  };
 
 
 
@@ -95,11 +93,70 @@
     }
   }
 
+
+  int** chercherCaseJouable() {
+    int nombreCasesJouables = 0;
+    boolean uneTrouvee = false;
+    // Compter le nombre de cases jouables
+    for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
+      for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
+        if (grillePions[ligne][colonne].getNumeroJoueur() == -1 && !uneTrouvee) {
+          nombreCasesJouables++;
+          uneTrouvee = true;
+        }
+      }
+      uneTrouvee=false;
+    }
+    
+    // Allouer un tableau 2D dynamique pour stocker les coordonnées des cases jouables
+    int** casesJouables = new int*[nombreCasesJouables];
+    for (int i = 0; i < nombreCasesJouables; i++) {
+      casesJouables[i] = new int[2];
+    }
+  
+    int index = 0;
+  
+    // Remplir le tableau avec les coordonnées des cases jouables
+    for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
+      for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
+        if (grillePions[ligne][colonne].getNumeroJoueur() == -1&& !uneTrouvee) {
+          casesJouables[index][0] = colonne;
+          casesJouables[index][1] = ligne;
+          index++;
+          uneTrouvee=true;
+        }
+      }
+       uneTrouvee=false;
+    }
+    /* TODO DEBUG SUPPRIMER 
+    for (int i = 0; i < nombreCasesJouables; i++) {
+      int x = casesJouables[i][1];
+      int y = casesJouables[i][0];
+      
+      // Afficher la coordonnée x avec un espace après
+      gb.display.print(x);
+      gb.display.print(":");
+      gb.display.print(y);
+      gb.display.print("/");
+    }*/
+    
+   // Libération de la mémoire allouée pour casesJouables
+    for (int i = 0; i < nombreCasesJouables; i++) {
+      delete[] casesJouables[i];
+    }
+    delete[] casesJouables;
+    
+    return casesJouables;
+ }
+
+
+
+  
   void setup() {
     gb.begin();
-    grillePions[0][0] = Pion(0,0,1);
-    grillePions[0][0] = Pion(0,0,2);
-    grillePions[0][0] = Pion(0,0,1);
+    grillePions[5][0] = Pion(5,0,1);
+    grillePions[4][0] = Pion(4,0,2);
+    grillePions[5][1] = Pion(5,1,1);
   }
 
   
@@ -107,7 +164,7 @@ void loop() {
   while (!gb.update());
   dessinerGrille();
   dessinerPions();
-
+  chercherCaseJouable();
   tourJouer();
 }
 
