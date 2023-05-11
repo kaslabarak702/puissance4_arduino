@@ -128,10 +128,10 @@
       }
        uneTrouvee=false;
     }
-    /* TODO DEBUG SUPPRIMER 
-    for (int i = 0; i < nombreCasesJouables; i++) {
-      int x = casesJouables[i][1];
-      int y = casesJouables[i][0];
+    /* TODO DEBUG SUPPRIMER*/ 
+    /*for (int i = 0; i < nombreCasesJouables; i++) {
+      int x = casesJouables[i][0];
+      int y = casesJouables[i][1];
       
       // Afficher la coordonnée x avec un espace après
       gb.display.print(x);
@@ -154,9 +154,17 @@
   
   void setup() {
     gb.begin();
-    grillePions[5][0] = Pion(5,0,1);
-    grillePions[4][0] = Pion(4,0,2);
-    grillePions[5][1] = Pion(5,1,1);
+    /* TODO DEBUG SUPPRIMER données de test*/
+    int colonneExclue = 2; // Choisissez la colonne à exclure (entre 0 et COLONNES_GRILLE-1)
+    for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
+      if (colonne != colonneExclue) {
+        for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
+          int joueur = (colonne % 2) + 1; // Alternance des joueurs 1 et 2
+          
+          grillePions[ligne][colonne] = Pion(ligne, colonne, joueur);
+        }
+      }
+    }
   }
 
   
@@ -174,8 +182,7 @@ int curseurX = 4;
 int curseurY = 2;
 
 void tourJouer() {
-  //gb.display.clear();
-  
+ 
   int colonnesJouables[7] = {1, 2, 3, 4, 5, 6, 7};
   int tailleColonnesJouable = 7;
 
@@ -194,7 +201,7 @@ void tourJouer() {
 
 void dessinerCurseur(){
   // Dessin du curseur
-  gb.display.print(valeurCurseur);
+  //gb.display.println(valeurCurseur);
   float xCellule = valeurCurseur * TAILLE_CELLULE - TAILLE_CELLULE/2 - curseurX/2;
   gb.display.drawRect(xCellule, 4, curseurX, curseurY);
 }
