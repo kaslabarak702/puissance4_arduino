@@ -1,47 +1,5 @@
   #include <Gamebuino-Meta.h>
-  
-  class Pion {
-    private:
-      int colonne; // Coordonnée abscisse du pion dans la grille
-      int ligne; // Coordonnée ordonnée du pion dans la grille
-      int numero_joueur; // Numéro du joueur associé au pion
-      
-    public:
-      Pion() {
-        colonne = 0;
-        ligne = 0;
-        numero_joueur = -1;
-      }
-    
-      Pion(int i, int j, int joueur) {
-        colonne = i;
-        ligne = j;
-        numero_joueur = joueur;
-      }
-      
-      int getCoordonneeI() {
-        return colonne;
-      }
-      
-      int getCoordonneeJ() {
-        return ligne;
-      }
-      
-      void setCoordonnees(int i, int j) {
-        colonne = i;
-        ligne = j;
-      }
-      
-      int getNumeroJoueur() {
-        return numero_joueur;
-      }
-      
-      void setNumeroJoueur(int joueur) {
-        numero_joueur = joueur;
-      }
-  };
  
-  
   const int COLONNES_GRILLE = 7; // Taille de la grille (7 colonnes x 6 lignes)
   const int LIGNES_GRILLE = 6;
   const int TAILLE_CELLULE = 8; // Taille d'une cellule de la grille
@@ -55,7 +13,7 @@
   const int LARGEUR_GRILLE = LIGNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
   const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la grille
   
-  Pion grillePions[LIGNES_GRILLE][COLONNES_GRILLE]; 
+  int grillePions[LIGNES_GRILLE][COLONNES_GRILLE]; 
   
   
   void dessinerGrille() {
@@ -79,7 +37,7 @@
     for (int j = 0; j < LIGNES_GRILLE; j++) {
         int xCellule = DECALAGE_GRILLE_X + i * TAILLE_CELLULE;
         int yCellule = DECALAGE_GRILLE_Y + j * TAILLE_CELLULE;
-        int numeroJoueur = grillePions[j][i].getNumeroJoueur(); // Récupérer le numéro du joueur associé au pion
+        int numeroJoueur = grillePions[j][i]; // Récupérer le numéro du joueur associé au pion
         if(numeroJoueur > 0&&numeroJoueur<3){
           if (numeroJoueur == 1) {
             gb.display.setColor(Color::red); // Couleur du joueur 1 (rouge)
@@ -100,7 +58,7 @@
     // Compter le nombre de cases jouables
     for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
       for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
-        if (grillePions[ligne][colonne].getNumeroJoueur() == -1 && !uneTrouvee) {
+        if (grillePions[ligne][colonne] == 0 && !uneTrouvee) {
           nombreCasesJouables++;
           uneTrouvee = true;
         }
@@ -119,7 +77,7 @@
     // Remplir le tableau avec les coordonnées des cases jouables
     for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
       for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
-        if (grillePions[ligne][colonne].getNumeroJoueur() == -1&& !uneTrouvee) {
+        if (grillePions[ligne][colonne] == 0&& !uneTrouvee) {
           casesJouables[index][0] = colonne;
           casesJouables[index][1] = ligne;
           index++;
@@ -161,7 +119,7 @@
         for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
           int joueur = (colonne % 2) + 1; // Alternance des joueurs 1 et 2
           
-          grillePions[ligne][colonne] = Pion(ligne, colonne, joueur);
+          grillePions[ligne][colonne] = joueur;
         }
       }
     }
@@ -197,8 +155,8 @@ void tourJouer() {
 
   if((gb.buttons.pressed(BUTTON_A)) && (indexCurseur < tailleColonnesJouable) && (indexCurseur < tailleColonnesJouable)){
     for(int i = LIGNES_GRILLE; i>=0; i--){
-      if(grillePions[i][valeurCurseur].getNumeroJoueur() == -1){
-        grillePions[i][valeurCurseur] = Pion(i,valeurCurseur,1);
+      if(grillePions[i][valeurCurseur] == 0){
+        grillePions[i][valeurCurseur] =1;
         dessinerPions();
         break;
       }
