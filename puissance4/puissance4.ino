@@ -113,7 +113,7 @@
   void setup() {
     gb.begin();
     /* TODO DEBUG SUPPRIMER données de test*/
-    int colonneExclue = 2; // Choisissez la colonne à exclure (entre 0 et COLONNES_GRILLE-1)
+    /*int colonneExclue = 2; // Choisissez la colonne à exclure (entre 0 et COLONNES_GRILLE-1)
     for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
       if (colonne != colonneExclue) {
         for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
@@ -122,7 +122,7 @@
           grillePions[ligne][colonne] = joueur;
         }
       }
-    }
+    }*/
   }
 
   
@@ -131,7 +131,7 @@ void loop() {
   dessinerGrille();
   dessinerPions();
   chercherCaseJouable();
-  tourJouer();
+  //tourJouer();
 }
 
 int indexCurseur = 0;
