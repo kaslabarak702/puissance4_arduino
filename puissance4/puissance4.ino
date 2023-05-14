@@ -167,6 +167,12 @@ void tourJouer() {
       if (grillePions[i][valeurCurseur] == 0) {
         grillePions[i][valeurCurseur] = 1;
         dessinerPions();
+
+        if (trouverLaPuissance4(int numero-du-joueur-qui-joue) == numero-du-joueur-qui-joue) {
+          gb.display.print("Bravo le joueur gagnant est le ");
+          gb.display.print(numero-du-joueur-qui-joue);
+        }
+
         break;
       }
     }
@@ -183,7 +189,6 @@ void dessinerCurseur() {
   float xCellule = valeurCurseur * TAILLE_CELLULE + TAILLE_CELLULE / 2 - curseurX / 2;
   gb.display.drawRect(xCellule, 4, curseurX, curseurY);
 }
-
 
 bool verifierLigne(int joueur_actuel, int colonne, int ligne, int decalage_droite = 0, int decalage_bas = 0) {
   int pionJoueurValide = 0;
