@@ -185,7 +185,51 @@ void dessinerCurseur() {
 }
 
 
+bool verifierLigne(int joueur_actuel, int colonne, int ligne, int decalage_droite = 0, int decalage_bas = 0) {
+  int pionJoueurValide = 0;
+  for (int droite = 0; droite < decalage_droite; droite++) {
+    for (int bas = 0; bas < decalage_bas; bas++) {
+      if (grillePions[colonne+droite][ligne+bas] == joueur_actuel) {
+        pionJoueurValide++;
+      }
+    }
+  }
 
+  if (pionJoueurValide == 4 ) {
+    return true;
+  } else  {
+    return false;
+  }
+}
 
+int trouverLaPuissance4(int joueur_actuel){
+  int joueur_gagnant = 0;
+  
+  for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
+    for (int ligne = 0; ligne < LIGNES_GRILLE; ligne++) {
+      if (grillePions[colonne][ligne] != joueur_actuel) {
+      continue;
+    };
 
+      //verification des pions a droite
+      if (verifierLigne(joueur_actuel, colonne, ligne, 4, 0) == true) {
+        joueur_gagnant = joueur_actuel;
+      }
+      //verification des pions en diagonale basse droite
+      if (verifierLigne(joueur_actuel, colonne, ligne, 4, 4) == true) {
+        joueur_gagnant = joueur_actuel;
+      }
+      //verification des pions en diagonale haute droite
+      if (verifierLigne(joueur_actuel, colonne, ligne, 4, -4) == true) {
+        joueur_gagnant = joueur_actuel;
+      }
+      //verification des pions au dessous
+      if (verifierLigne(joueur_actuel, colonne, ligne, 0, 4) == true) {
+        joueur_gagnant = joueur_actuel;
+      }
 
+    }      
+  }
+
+  return joueur_gagnant;
+}
