@@ -1,23 +1,35 @@
 #include <Gamebuino-Meta.h>
 
+/*
+    Implémentation pour GAMEBUINO en META4 d'un puissance 4 complet.
+
+    Les parametres du programme sont ajustables ci dessous (a part quelques problemes dus a la taille de l'écran,
+    vous pouvez choisir librement la taille de la grille, entre autres!).
+
+    Auteurs : Victor BARDIN, Laurent THILLOU, Felix laterrot
+
+*/
+
 const int COLONNES_GRILLE = 7; // Taille de la grille (7 colonnes x 6 lignes)
 const int LIGNES_GRILLE = 6;
+
 const int TAILLE_CELLULE = 8; // Taille d'une cellule de la grille
 const int LARGEUR_ECRAN = gb.display.width();
 const int HAUTEUR_ECRAN = gb.display.height();
-const int DECALAGE_GRILLE_X = 0; // Décalage horizontal de la grille
-const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.25; // Décalage vertical de la grille
+const int DECALAGE_GRILLE_X = 0; // Décalage horizontal de la grille (modification déconseillée)
+const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.25; // Décalage vertical de la grille (modification déconseillée)
 const int LARGEUR_GRILLE = LIGNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
 const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la grille
-int grillePions[LIGNES_GRILLE][COLONNES_GRILLE];
+int grillePions[LIGNES_GRILLE][COLONNES_GRILLE]; //la version logique du tableau de jeu
 int joueurEnCours = 1;
 boolean aJoue = false;
 boolean partieTerminee = false;
 
-int absCurseur = 0;
+//le curseur permet au joueurEnCours de choisir dans quelle colonne jouer
+int absCurseur = 0; //abscisse du curseur
 int indexCurseur = 0;
-int curseurX = 4;
-int curseurY = 2;
+int largeurCurseur = 4;
+int hauteurCurseur = 2;
 
 int scores[3]; // nuls / joueur 1 / joueur 2
 
@@ -29,10 +41,10 @@ void loop() {
   while (!gb.update());
   gb.display.clear();
   dessinerGrille();
-  
+
   dessinerPions();
   afficherScores();
-  
+
   if (!partieTerminee) {
     dessinerCurseur();
     positionnerCouleur(joueurEnCours);
@@ -40,62 +52,64 @@ void loop() {
     if (verifierPuissance4(joueurEnCours) == joueurEnCours) {
       partieTerminee = true;
       scores[joueurEnCours]++;
-   }
+    }
     if (grillePleine()) {
       partieTerminee = true;
       scores[0]++;
     }
     // Alternance des joueurs
-    if (aJoue&&!partieTerminee) {
+    if (aJoue && !partieTerminee) {
       changerDeJoueur();
       aJoue = false;
     }
   } else { //la partie est terminee
-    gb.display.setCursor(1,1);
+    gb.display.setCursor(1, 1);
     gb.display.setColor(Color::green);
     gb.display.println("Partie terminee : ");
     if (grillePleine()) {
       positionnerCouleur(0);
       gb.display.print("egalite! ");
     } else {
-      
+
       positionnerCouleur(joueurEnCours);
       gb.display.print("J");
       gb.display.print(joueurEnCours);
       gb.display.print(" gagne! ");
-      
+
     }
     positionnerCouleur(0);
     gb.display.print("App. sur A ");
     if (gb.buttons.pressed(BUTTON_A)) {
       viderLaGrille();
-      partieTerminee=false;
+      partieTerminee = false;
     }
     //TODO SCORING
   }
 }
 
-void afficherScores(){
-   gb.display.setFontSize(1);
+void afficherScores() {
+  gb.display.setFontSize(1);
 
-  
+
 
   // Effacer la zone des scores
   positionnerCouleur(0);
-  gb.display.drawRect(LARGEUR_ECRAN-22, DECALAGE_GRILLE_Y, 22, HAUTEUR_GRILLE);
+  gb.display.drawRect(LARGEUR_ECRAN - 22, DECALAGE_GRILLE_Y, 22, HAUTEUR_GRILLE);
 
   positionnerCouleur(0);
-  gb.display.setCursor(LARGEUR_ECRAN -20, 20);
+  gb.display.setCursor(LARGEUR_ECRAN - 20, 10);
+  gb.display.print("SCORE");
+  gb.display.setCursor(LARGEUR_ECRAN - 20, 20);
   gb.display.print("NUL:");
   gb.display.print(scores[0]);
-  
+
   positionnerCouleur(1);
-  gb.display.setCursor(LARGEUR_ECRAN -20, 30);
+  gb.display.setCursor(LARGEUR_ECRAN - 20, 30);
   gb.display.print("J1:");
   gb.display.print(scores[1]);
-  
+
   positionnerCouleur(2);
-  gb.display.setCursor(LARGEUR_ECRAN -20, 40);
+  gb.display.setCursor(LARGEUR_ECRAN - 20, 40);
   gb.display.print("J2:");
   gb.display.print(scores[2]);
 }
@@ -219,7 +233,7 @@ void positionnerCouleur(int joueur) {
     gb.display.setColor(Color::red); // Couleur du joueur 1 (rouge)
   } else if (joueur == 2 ) {
     gb.display.setColor(Color::yellow); // Couleur du joueur 2 (jaune)
-  }else if (joueur == 0 ) {
+  } else if (joueur == 0 ) {
     gb.display.setColor(Color::white); // Couleur du joueur 2 (jaune)
   }
 }
@@ -244,7 +258,7 @@ void tourJoueur() {
   if (gb.buttons.pressed(BUTTON_A) && indexCurseur < nombreCasesJouables) {
     grillePions[casesJouables[indexCurseur][1]][absCurseur] = joueurEnCours;
     aJoue = true;
-    
+
   }
   // Libération de la mémoire allouée pour casesJouables
   for (int i = 0; i < nombreCasesJouables; i++) {
@@ -258,8 +272,8 @@ void tourJoueur() {
 void dessinerCurseur() {
   // Dessin du curseur
   positionnerCouleur(joueurEnCours);
-  float xCellule = absCurseur * TAILLE_CELLULE + TAILLE_CELLULE / 2 - curseurX / 2;
-  gb.display.drawRect(xCellule, 10, curseurX, curseurY);
+  float xCellule = absCurseur * TAILLE_CELLULE + TAILLE_CELLULE / 2 - largeurCurseur / 2;
+  gb.display.drawRect(xCellule, 10, largeurCurseur, hauteurCurseur);
 }
 
 
