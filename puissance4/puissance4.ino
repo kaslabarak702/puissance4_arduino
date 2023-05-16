@@ -55,14 +55,18 @@ void loop() {
     gb.display.setColor(Color::green);
     gb.display.println("Partie terminee : ");
     if (grillePleine()) {
-      gb.display.println("egalite!");
+      positionnerCouleur(0);
+      gb.display.print("egalite! ");
     } else {
       
       positionnerCouleur(joueurEnCours);
-      gb.display.print("le joueur ");
+      gb.display.print("J");
       gb.display.print(joueurEnCours);
-      gb.display.print(" gagne!");
+      gb.display.print(" gagne! ");
+      
     }
+    positionnerCouleur(0);
+    gb.display.print("App. sur A ");
     if (gb.buttons.pressed(BUTTON_A)) {
       viderLaGrille();
       partieTerminee=false;
