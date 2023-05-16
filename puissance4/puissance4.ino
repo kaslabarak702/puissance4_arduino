@@ -8,7 +8,7 @@ const int LARGEUR_ECRAN = gb.display.width();
 const int HAUTEUR_ECRAN = gb.display.height();
 
 const int DECALAGE_GRILLE_X = 0; // Décalage horizontal de la grille
-const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.2; // Décalage vertical de la grille
+const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.25; // Décalage vertical de la grille
 
 const int LARGEUR_GRILLE = LIGNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
 const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la grille
@@ -17,7 +17,6 @@ int grillePions[LIGNES_GRILLE][COLONNES_GRILLE];
 
 
 void dessinerGrille() {
-  gb.display.clear();
 
   // Dessin de la grille
   for (int i = 0; i < COLONNES_GRILLE; i++) {
@@ -39,20 +38,14 @@ void dessinerPions() {
       int yCellule = DECALAGE_GRILLE_Y + j * TAILLE_CELLULE;
       int numeroJoueur = grillePions[j][i]; // Récupérer le numéro du joueur associé au pion
       if (numeroJoueur > 0 && numeroJoueur < 3) {
-        if (numeroJoueur == 1) {
-          gb.display.setColor(Color::red); // Couleur du joueur 1 (rouge)
-        } else if (numeroJoueur == 2) {
-          gb.display.setColor(Color::yellow); // Couleur du joueur 2 (jaune)
-        }
-
+        positionnerCouleur(numeroJoueur);
         gb.display.fillCircle(xCellule + TAILLE_CELLULE / 2 - 1, yCellule + TAILLE_CELLULE / 2 - 1, TAILLE_CELLULE / 2 - 2);
       }
     }
   }
 }
 
-
-int** chercherCaseJouable() {
+int compterCasesJouables() {
   int nombreCasesJouables = 0;
   boolean uneTrouvee = false;
   // Compter le nombre de cases jouables
@@ -65,7 +58,12 @@ int** chercherCaseJouable() {
     }
     uneTrouvee = false;
   }
+  return nombreCasesJouables;
+}
 
+int** chercherCaseJouable(int nombreCasesJouables) {
+
+  boolean uneTrouvee = false;
   // Allouer un tableau 2D dynamique pour stocker les coordonnées des cases jouables
   int** casesJouables = new int*[nombreCasesJouables];
   for (int i = 0; i < nombreCasesJouables; i++) {
@@ -92,17 +90,13 @@ int** chercherCaseJouable() {
     int y = casesJouables[i][1];
 
     // Afficher la coordonnée x avec un espace après
-    gb.display.print(x);
-    gb.display.print(":");
-    gb.display.print(y);
-    gb.display.print("/");
+    /*gb.display.print(x);
+      gb.display.print(":");
+      gb.display.print(y);
+      gb.display.print("/");*/
   }
 
-  // Libération de la mémoire allouée pour casesJouables
-  for (int i = 0; i < nombreCasesJouables; i++) {
-    delete[] casesJouables[i];
-  }
-  delete[] casesJouables;
+
 
   return casesJouables;
 }
@@ -110,74 +104,63 @@ int** chercherCaseJouable() {
 
 
 
-void setup() {
-  gb.begin();
-  /* TODO DEBUG SUPPRIMER données de test*/
-  /*int colonneExclue = 2; // Choisissez la colonne à exclure (entre 0 et COLONNES_GRILLE-1)
-    for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
-    if (colonne != colonneExclue) {
-      for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
-        int joueur = (colonne % 2) + 1; // Alternance des joueurs 1 et 2
 
-        grillePions[ligne][colonne] = joueur;
-      }
-    }
-    }*/
-  /*for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
-    if (colonne ==2) {
-      for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
-        int joueur = (rand() % 2) + 1; // Génère un nombre aléatoire entre 1 et 2
 
-        grillePions[ligne][colonne] = joueur;
-      }
+boolean grillePleine() {
+  boolean plein = true;
+  for (int i = 0; i < 7; i++) {
+    if (grillePions[0][i] == 0) {
+      plein = false;
     }
-  }*/
+  }
+  return plein;
+}
+
+void positionnerCouleur(int joueur) {
+  if (joueur == 1) {
+    gb.display.setColor(Color::red); // Couleur du joueur 1 (rouge)
+  } else if (joueur == 2) {
+    gb.display.setColor(Color::yellow); // Couleur du joueur 2 (jaune)
+  }
 }
 
 
-void loop() {
-  while (!gb.update());
-  dessinerGrille();
-  dessinerPions();
-  //chercherCaseJouable();
-  tourJouer();
-}
 
+
+
+
+
+
+int absCurseur = 0;
 int indexCurseur = 0;
-int valeurCurseur = 0;
 int curseurX = 4;
 int curseurY = 2;
 
-void tourJouer() {
-  //gb.display.clear();
+void tourJoueur() {
 
-  int** colonnesJouables = chercherCaseJouable();
-  int tailleColonnesJouable = 7;
 
-  if ((gb.buttons.pressed(BUTTON_LEFT)) && indexCurseur > 0) {
+  int nombreCasesJouables = compterCasesJouables();
+  int** casesJouables = chercherCaseJouable(nombreCasesJouables);
+
+  if (gb.buttons.pressed(BUTTON_LEFT) && indexCurseur > 0) {
     indexCurseur -= 1;
   }
-  if ((gb.buttons.pressed(BUTTON_RIGHT)) && indexCurseur < tailleColonnesJouable && indexCurseur > 0) {
+
+  if (gb.buttons.pressed(BUTTON_RIGHT) && indexCurseur < nombreCasesJouables - 1) {
     indexCurseur += 1;
   }
-  valeurCurseur = colonnesJouables[indexCurseur][0];
 
-  if ((gb.buttons.pressed(BUTTON_A)) && (indexCurseur < tailleColonnesJouable) && (indexCurseur < tailleColonnesJouable)) {
-    for (int i = LIGNES_GRILLE; i >= 0; i--) {
-      if (grillePions[i][valeurCurseur] == 0) {
-        grillePions[i][valeurCurseur] = 1;
-        dessinerPions();
+  absCurseur = casesJouables[indexCurseur][0];
 
-        if (trouverLaPuissance4(int numero-du-joueur-qui-joue) == numero-du-joueur-qui-joue) {
-          gb.display.print("Bravo le joueur gagnant est le ");
-          gb.display.print(numero-du-joueur-qui-joue);
-        }
-
-        break;
-      }
-    }
+  if (gb.buttons.pressed(BUTTON_A) && indexCurseur < nombreCasesJouables) {
+    grillePions[casesJouables[indexCurseur][1]][absCurseur] = joueurEnCours;
+    aJoue = true;
   }
-
+  // Libération de la mémoire allouée pour casesJouables
+  for (int i = 0; i < nombreCasesJouables; i++) {
+    delete[] casesJouables[i];
+  }
+  delete[] casesJouables;
   dessinerCurseur();
 }
 
@@ -185,16 +168,15 @@ void tourJouer() {
 
 void dessinerCurseur() {
   // Dessin du curseur
-  gb.display.println(valeurCurseur);
-  float xCellule = valeurCurseur * TAILLE_CELLULE + TAILLE_CELLULE / 2 - curseurX / 2;
-  gb.display.drawRect(xCellule, 4, curseurX, curseurY);
+  float xCellule = absCurseur * TAILLE_CELLULE + TAILLE_CELLULE / 2 - curseurX / 2;
+  gb.display.drawRect(xCellule, 10, curseurX, curseurY);
 }
 
 bool verifierLigne(int joueur_actuel, int colonne, int ligne, int decalage_droite = 0, int decalage_bas = 0) {
   int pionJoueurValide = 0;
   for (int droite = 0; droite < decalage_droite; droite++) {
     for (int bas = 0; bas < decalage_bas; bas++) {
-      if (grillePions[colonne+droite][ligne+bas] == joueur_actuel) {
+      if (grillePions[colonne + droite][ligne + bas] == joueur_actuel) {
         pionJoueurValide++;
       }
     }
@@ -207,14 +189,14 @@ bool verifierLigne(int joueur_actuel, int colonne, int ligne, int decalage_droit
   }
 }
 
-int trouverLaPuissance4(int joueur_actuel){
+int trouverLaPuissance4(int joueur_actuel) {
   int joueur_gagnant = 0;
-  
+
   for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
     for (int ligne = 0; ligne < LIGNES_GRILLE; ligne++) {
       if (grillePions[colonne][ligne] != joueur_actuel) {
-      continue;
-    };
+        continue;
+      };
 
       //verification des pions a droite
       if (verifierLigne(joueur_actuel, colonne, ligne, 4, 0) == true) {
@@ -233,8 +215,70 @@ int trouverLaPuissance4(int joueur_actuel){
         joueur_gagnant = joueur_actuel;
       }
 
-    }      
+    }
   }
 
   return joueur_gagnant;
+}
+
+void setup() {
+  gb.begin();
+  /* TODO DEBUG SUPPRIMER données de test*/
+  /*int colonneExclue = 3; // Choisissez la colonne à exclure (entre 0 et COLONNES_GRILLE-1)
+    for (int i = 5; i > 1;i--){
+    grillePions[i][i]=1;
+    }*/
+
+}
+
+int joueurEnCours = 1;
+boolean aJoue = false;
+boolean partieTerminee = false;
+
+void loop() {
+  while (!gb.update());
+  gb.display.clear();
+  dessinerGrille();
+  dessinerPions();
+
+  if (!partieTerminee) {
+    positionnerCouleur(joueurEnCours);
+    tourJoueur();
+
+    gb.display.print("C'est au joueur ");
+    gb.display.print(joueurEnCours);
+
+    // Alternance des joueurs
+    if (aJoue) {
+      if (joueurEnCours == 1) {
+        joueurEnCours = 2 ;
+      } else {
+        joueurEnCours = 1;
+      }
+
+      aJoue = false;
+    }
+    if (trouverLaPuissance4(joueurEnCours) == joueurEnCours) {
+      gb.display.print("Bravo, le joueur gagnant est le ");
+      gb.display.print(joueurEnCours);
+      partieTerminee = true;
+
+
+    } else if (grillePleine()) {
+      partieTerminee = true;
+    }
+  } else {
+    gb.display.setColor(Color::green);
+    gb.display.println("Partie terminee : ");
+    if (grillePleine()) {
+      gb.display.println("egalite!");
+    } else {
+      positionnerCouleur(joueurEnCours);
+      gb.display.print("le joueur ");
+      gb.display.print(joueurEnCours);
+      gb.display.print(" gagne!");
+    }
+    //ETAT FIN DE PARTIE joueur 1, joueur2,grille pleine
+    //SCORING
+  }
 }
