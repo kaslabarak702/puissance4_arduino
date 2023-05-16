@@ -26,6 +26,7 @@ void setup() {
 }
 
 int joueurEnCours = 1;
+int joueurPrecedent = 3;
 boolean aJoue = false;
 boolean partieTerminee = false;
 
@@ -46,19 +47,18 @@ void loop() {
     if (aJoue) {
       if (joueurEnCours == 1) {
         joueurEnCours = 2 ;
+        joueurPrecedent = 1;
       } else {
         joueurEnCours = 1;
+        joueurPrecedent = 2;
       }
 
       aJoue = false;
     }
-    if (trouverLaPuissance4(joueurEnCours) == joueurEnCours) {
-      gb.display.print("Bravo, le joueur gagnant est le ");
-      gb.display.print(joueurEnCours);
-      partieTerminee = true;
+    
 
 
-    } else if (grillePleine()) {
+    if (grillePleine()) {
       partieTerminee = true;
     }
   } else {
@@ -69,7 +69,7 @@ void loop() {
     } else {
       positionnerCouleur(joueurEnCours);
       gb.display.print("le joueur ");
-      gb.display.print(joueurEnCours);
+      gb.display.print(joueurPrecedent);
       gb.display.print(" gagne!");
     }
     //ETAT FIN DE PARTIE joueur 1, joueur2,grille pleine
@@ -178,19 +178,12 @@ boolean grillePleine() {
 }
 
 void positionnerCouleur(int joueur) {
-  if (joueur == 1) {
+  if (joueur == 1 ) {
     gb.display.setColor(Color::red); // Couleur du joueur 1 (rouge)
-  } else if (joueur == 2) {
+  } else if (joueur == 2 ) {
     gb.display.setColor(Color::yellow); // Couleur du joueur 2 (jaune)
   }
 }
-
-
-
-
-
-
-
 
 int absCurseur = 0;
 int indexCurseur = 0;
@@ -198,7 +191,6 @@ int curseurX = 4;
 int curseurY = 2;
 
 void tourJoueur() {
-
 
   int nombreCasesJouables = compterCasesJouables();
   int** casesJouables = chercherCaseJouable(nombreCasesJouables);
@@ -216,6 +208,9 @@ void tourJoueur() {
   if (gb.buttons.pressed(BUTTON_A) && indexCurseur < nombreCasesJouables) {
     grillePions[casesJouables[indexCurseur][1]][absCurseur] = joueurEnCours;
     aJoue = true;
+    if (trouverLaPuissance4(joueurEnCours) == joueurEnCours) {
+      partieTerminee = true;
+    }
   }
   // Libération de la mémoire allouée pour casesJouables
   for (int i = 0; i < nombreCasesJouables; i++) {
@@ -233,47 +228,68 @@ void dessinerCurseur() {
   gb.display.drawRect(xCellule, 10, curseurX, curseurY);
 }
 
-bool verifierLigne(int joueur_actuel, int colonne, int ligne, int decalage_droite = 0, int decalage_bas = 0) {
-  int pionJoueurValide = 0;
-  for (int droite = 0; droite < decalage_droite; droite++) {
-    for (int bas = 0; bas < decalage_bas; bas++) {
-      if (grillePions[colonne + droite][ligne + bas] == joueur_actuel) {
-        pionJoueurValide++;
-      }
-    }
-  }
 
-  if (pionJoueurValide == 4 ) {
-    return true;
-  } else  {
-    return false;
-  }
-}
 
 int trouverLaPuissance4(int joueur_actuel) {
   int joueur_gagnant = 0;
-
+  int pionJoueurValide = 0;
+  
   for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
     for (int ligne = 0; ligne < LIGNES_GRILLE; ligne++) {
-      if (grillePions[colonne][ligne] != joueur_actuel) {
+      if (grillePions[ligne][colonne] != joueur_actuel) {
         continue;
       };
 
       //verification des pions a droite
-      if (verifierLigne(joueur_actuel, colonne, ligne, 4, 0) == true) {
-        joueur_gagnant = joueur_actuel;
+      if (grillePions[ligne][colonne+1] == joueur_actuel) {
+        pionJoueurValide = 0;
+        for (int decalage = 0; decalage <= 3 ; decalage++) {
+          if (grillePions[ligne][colonne + decalage] == joueur_actuel) {
+            pionJoueurValide++;
+          }
+        }
+        if (pionJoueurValide == 4 ) {
+          joueur_gagnant = joueur_actuel;
+        }
       }
+      
       //verification des pions en diagonale basse droite
-      if (verifierLigne(joueur_actuel, colonne, ligne, 4, 4) == true) {
-        joueur_gagnant = joueur_actuel;
+      if (grillePions[ligne+1][colonne+1] == joueur_actuel) {
+        pionJoueurValide = 0;
+        for (int decalage = 0; decalage <= 3 ; decalage++) {
+          if (grillePions[ligne + decalage][colonne + decalage] == joueur_actuel) {
+            pionJoueurValide++;
+          }
+        }
+        if (pionJoueurValide == 4 ) {
+          joueur_gagnant = joueur_actuel;
+        }
       }
+      
       //verification des pions en diagonale haute droite
-      if (verifierLigne(joueur_actuel, colonne, ligne, 4, -4) == true) {
-        joueur_gagnant = joueur_actuel;
+      if (grillePions[ligne-1][colonne+1] == joueur_actuel) {
+        pionJoueurValide = 0;
+        for (int decalage = 0; decalage <= 3 ; decalage++) {
+          if (grillePions[ligne - decalage][colonne + decalage] == joueur_actuel) {
+            pionJoueurValide++;
+          }
+        }
+        if (pionJoueurValide == 4 ) {
+          joueur_gagnant = joueur_actuel;
+        }
       }
+      
       //verification des pions au dessous
-      if (verifierLigne(joueur_actuel, colonne, ligne, 0, 4) == true) {
-        joueur_gagnant = joueur_actuel;
+      if (grillePions[ligne+1][colonne] == joueur_actuel) {
+        pionJoueurValide = 0;
+        for (int decalage = 0; decalage <= 3 ; decalage++) {
+          if (grillePions[ligne + decalage][colonne] == joueur_actuel) {
+            pionJoueurValide++;
+          }
+        }
+        if (pionJoueurValide == 4 ) {
+          joueur_gagnant = joueur_actuel;
+        }
       }
 
     }
