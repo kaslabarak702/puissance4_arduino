@@ -15,6 +15,67 @@ const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la
 
 int grillePions[LIGNES_GRILLE][COLONNES_GRILLE];
 
+void setup() {
+  gb.begin();
+  /* TODO DEBUG SUPPRIMER données de test*/
+  /*int colonneExclue = 3; // Choisissez la colonne à exclure (entre 0 et COLONNES_GRILLE-1)
+    for (int i = 5; i > 1;i--){
+    grillePions[i][i]=1;
+    }*/
+
+}
+
+int joueurEnCours = 1;
+boolean aJoue = false;
+boolean partieTerminee = false;
+
+void loop() {
+  while (!gb.update());
+  gb.display.clear();
+  dessinerGrille();
+  dessinerPions();
+
+  if (!partieTerminee) {
+    positionnerCouleur(joueurEnCours);
+    tourJoueur();
+
+    gb.display.print("C'est au joueur ");
+    gb.display.print(joueurEnCours);
+
+    // Alternance des joueurs
+    if (aJoue) {
+      if (joueurEnCours == 1) {
+        joueurEnCours = 2 ;
+      } else {
+        joueurEnCours = 1;
+      }
+
+      aJoue = false;
+    }
+    if (trouverLaPuissance4(joueurEnCours) == joueurEnCours) {
+      gb.display.print("Bravo, le joueur gagnant est le ");
+      gb.display.print(joueurEnCours);
+      partieTerminee = true;
+
+
+    } else if (grillePleine()) {
+      partieTerminee = true;
+    }
+  } else {
+    gb.display.setColor(Color::green);
+    gb.display.println("Partie terminee : ");
+    if (grillePleine()) {
+      gb.display.println("egalite!");
+    } else {
+      positionnerCouleur(joueurEnCours);
+      gb.display.print("le joueur ");
+      gb.display.print(joueurEnCours);
+      gb.display.print(" gagne!");
+    }
+    //ETAT FIN DE PARTIE joueur 1, joueur2,grille pleine
+    //SCORING
+  }
+}
 
 void dessinerGrille() {
 
@@ -219,66 +280,4 @@ int trouverLaPuissance4(int joueur_actuel) {
   }
 
   return joueur_gagnant;
-}
-
-void setup() {
-  gb.begin();
-  /* TODO DEBUG SUPPRIMER données de test*/
-  /*int colonneExclue = 3; // Choisissez la colonne à exclure (entre 0 et COLONNES_GRILLE-1)
-    for (int i = 5; i > 1;i--){
-    grillePions[i][i]=1;
-    }*/
-
-}
-
-int joueurEnCours = 1;
-boolean aJoue = false;
-boolean partieTerminee = false;
-
-void loop() {
-  while (!gb.update());
-  gb.display.clear();
-  dessinerGrille();
-  dessinerPions();
-
-  if (!partieTerminee) {
-    positionnerCouleur(joueurEnCours);
-    tourJoueur();
-
-    gb.display.print("C'est au joueur ");
-    gb.display.print(joueurEnCours);
-
-    // Alternance des joueurs
-    if (aJoue) {
-      if (joueurEnCours == 1) {
-        joueurEnCours = 2 ;
-      } else {
-        joueurEnCours = 1;
-      }
-
-      aJoue = false;
-    }
-    if (trouverLaPuissance4(joueurEnCours) == joueurEnCours) {
-      gb.display.print("Bravo, le joueur gagnant est le ");
-      gb.display.print(joueurEnCours);
-      partieTerminee = true;
-
-
-    } else if (grillePleine()) {
-      partieTerminee = true;
-    }
-  } else {
-    gb.display.setColor(Color::green);
-    gb.display.println("Partie terminee : ");
-    if (grillePleine()) {
-      gb.display.println("egalite!");
-    } else {
-      positionnerCouleur(joueurEnCours);
-      gb.display.print("le joueur ");
-      gb.display.print(joueurEnCours);
-      gb.display.print(" gagne!");
-    }
-    //ETAT FIN DE PARTIE joueur 1, joueur2,grille pleine
-    //SCORING
-  }
 }
