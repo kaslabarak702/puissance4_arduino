@@ -8,6 +8,8 @@
 
     Auteurs : Victor BARDIN, Laurent THILLOU, Felix laterrot
 
+    Evolutions envisagées : rajouter plus de joueurs, tres peu de code serait changé
+
 */
 
 const int COLONNES_GRILLE = 7; // Taille de la grille (7 colonnes x 6 lignes)
@@ -21,17 +23,17 @@ const int DECALAGE_GRILLE_Y = HAUTEUR_ECRAN * 0.25; // Décalage vertical de la 
 const int LARGEUR_GRILLE = LIGNES_GRILLE * TAILLE_CELLULE; // Largeur de la grille
 const int HAUTEUR_GRILLE = (HAUTEUR_ECRAN - DECALAGE_GRILLE_Y); // Hauteur de la grille
 int grillePions[LIGNES_GRILLE][COLONNES_GRILLE]; //la version logique du tableau de jeu
+
 int joueurEnCours = 1;
+int scores[3]; // nuls / joueur 1 / joueur 2
 boolean aJoue = false;
+
 boolean partieTerminee = false;
 
 //le curseur permet au joueurEnCours de choisir dans quelle colonne jouer
 int absCurseur = 0; //abscisse du curseur
 int indexCurseur = 0;
-int largeurCurseur = 4;
-int hauteurCurseur = 2;
 
-int scores[3]; // nuls / joueur 1 / joueur 2
 
 void setup() {
   gb.begin();
@@ -41,14 +43,16 @@ void loop() {
   while (!gb.update());
   gb.display.clear();
   dessinerGrille();
-
   dessinerPions();
   afficherScores();
 
   if (!partieTerminee) {
+    //on joue un tour pour le joueurEnCours
     dessinerCurseur();
     positionnerCouleur(joueurEnCours);
-    tourJoueur();
+    jouerUnTour();
+
+    //on vérifie si la partie se termine
     if (verifierPuissance4(joueurEnCours) == joueurEnCours) {
       partieTerminee = true;
       scores[joueurEnCours]++;
@@ -57,7 +61,8 @@ void loop() {
       partieTerminee = true;
       scores[0]++;
     }
-    // Alternance des joueurs
+    
+    // puis on change de joueur
     if (aJoue && !partieTerminee) {
       changerDeJoueur();
       aJoue = false;
@@ -70,7 +75,6 @@ void loop() {
       positionnerCouleur(0);
       gb.display.print("egalite! ");
     } else {
-
       positionnerCouleur(joueurEnCours);
       gb.display.print("J");
       gb.display.print(joueurEnCours);
@@ -83,33 +87,27 @@ void loop() {
       viderLaGrille();
       partieTerminee = false;
     }
-    //TODO SCORING
   }
 }
 
 void afficherScores() {
-  gb.display.setFontSize(1);
-
-
-
-  // Effacer la zone des scores
   positionnerCouleur(0);
   gb.display.drawRect(LARGEUR_ECRAN - 22, DECALAGE_GRILLE_Y, 22, HAUTEUR_GRILLE);
 
   positionnerCouleur(0);
-  gb.display.setCursor(LARGEUR_ECRAN - 20, 10);
-  gb.display.print("SCORE");
   gb.display.setCursor(LARGEUR_ECRAN - 20, 20);
+  gb.display.print("SCORE");
+  gb.display.setCursor(LARGEUR_ECRAN - 20, 30);
   gb.display.print("NUL:");
   gb.display.print(scores[0]);
 
   positionnerCouleur(1);
-  gb.display.setCursor(LARGEUR_ECRAN - 20, 30);
+  gb.display.setCursor(LARGEUR_ECRAN - 20, 40);
   gb.display.print("J1:");
   gb.display.print(scores[1]);
 
   positionnerCouleur(2);
-  gb.display.setCursor(LARGEUR_ECRAN - 20, 40);
+  gb.display.setCursor(LARGEUR_ECRAN - 20, 50);
   gb.display.print("J2:");
   gb.display.print(scores[2]);
 }
@@ -128,21 +126,17 @@ void viderLaGrille() {
       grillePions[i][j] = 0;
     }
   }
-
 }
 
 void dessinerGrille() {
-
-  // Dessin de la grille
   for (int i = 0; i < COLONNES_GRILLE; i++) {
     for (int j = 0; j < LIGNES_GRILLE; j++) {
       int xCellule = DECALAGE_GRILLE_X + i * TAILLE_CELLULE;
       int yCellule = DECALAGE_GRILLE_Y + j * TAILLE_CELLULE;
-
       gb.display.drawRect(xCellule, yCellule, TAILLE_CELLULE, TAILLE_CELLULE);
     }
   }
-};
+}
 
 
 
@@ -162,11 +156,10 @@ void dessinerPions() {
 
 int compterCasesJouables() {
   int nombreCasesJouables = 0;
-  boolean uneTrouvee = false;
-  // Compter le nombre de cases jouables
+  boolean uneTrouvee = false; //on ne compte qu'une ou 0 case jouable par colonne
   for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
     for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
-      if (grillePions[ligne][colonne] == 0 && !uneTrouvee) {
+      if (!uneTrouvee && grillePions[ligne][colonne] == 0) {
         nombreCasesJouables++;
         uneTrouvee = true;
       }
@@ -179,14 +172,12 @@ int compterCasesJouables() {
 int** chercherCaseJouable(int nombreCasesJouables) {
 
   boolean uneTrouvee = false;
-  // Allouer un tableau 2D dynamique pour stocker les coordonnées des cases jouables
-  int** casesJouables = new int*[nombreCasesJouables];
+  int** casesJouables = new int*[nombreCasesJouables];  // tableau 2D dynamique pour stocker les coordonnées des cases jouables
   for (int i = 0; i < nombreCasesJouables; i++) {
     casesJouables[i] = new int[2];
   }
 
   int index = 0;
-
   // Remplir le tableau avec les coordonnées des cases jouables
   for (int colonne = 0; colonne < COLONNES_GRILLE; colonne++) {
     for (int ligne = LIGNES_GRILLE - 1; ligne >= 0; ligne--) {
@@ -199,24 +190,8 @@ int** chercherCaseJouable(int nombreCasesJouables) {
     }
     uneTrouvee = false;
   }
-  /* TODO DEBUG SUPPRIMER*/
-  for (int i = 0; i < nombreCasesJouables; i++) {
-    int x = casesJouables[i][0];
-    int y = casesJouables[i][1];
-
-    // Afficher la coordonnée x avec un espace après
-    /*gb.display.print(x);
-      gb.display.print(":");
-      gb.display.print(y);
-      gb.display.print("/");*/
-  }
-
-
-
   return casesJouables;
 }
-
-
 
 boolean grillePleine() {
   boolean plein = true;
@@ -233,34 +208,34 @@ void positionnerCouleur(int joueur) {
     gb.display.setColor(Color::red); // Couleur du joueur 1 (rouge)
   } else if (joueur == 2 ) {
     gb.display.setColor(Color::yellow); // Couleur du joueur 2 (jaune)
-  } else if (joueur == 0 ) {
-    gb.display.setColor(Color::white); // Couleur du joueur 2 (jaune)
+  } else {
+    gb.display.setColor(Color::white); // Couleur par défaut (blanc)
   }
 }
 
 
 
-void tourJoueur() {
-
+void jouerUnTour() {
+  
   int nombreCasesJouables = compterCasesJouables();
   int** casesJouables = chercherCaseJouable(nombreCasesJouables);
 
+  //déplacement du curseur
   if (gb.buttons.pressed(BUTTON_LEFT) && indexCurseur > 0) {
     indexCurseur -= 1;
-  }
-
-  if (gb.buttons.pressed(BUTTON_RIGHT) && indexCurseur < nombreCasesJouables - 1) {
+  }else if (gb.buttons.pressed(BUTTON_RIGHT) && indexCurseur < nombreCasesJouables - 1) {
     indexCurseur += 1;
   }
-
   absCurseur = casesJouables[indexCurseur][0];
 
+  //jeu dans une colonne
   if (gb.buttons.pressed(BUTTON_A) && indexCurseur < nombreCasesJouables) {
     grillePions[casesJouables[indexCurseur][1]][absCurseur] = joueurEnCours;
     aJoue = true;
 
   }
-  // Libération de la mémoire allouée pour casesJouables
+  
+  //libération de la mémoire allouée pour casesJouables
   for (int i = 0; i < nombreCasesJouables; i++) {
     delete[] casesJouables[i];
   }
@@ -270,15 +245,15 @@ void tourJoueur() {
 
 
 void dessinerCurseur() {
-  // Dessin du curseur
   positionnerCouleur(joueurEnCours);
-  float xCellule = absCurseur * TAILLE_CELLULE + TAILLE_CELLULE / 2 - largeurCurseur / 2;
-  gb.display.drawRect(xCellule, 10, largeurCurseur, hauteurCurseur);
+  float xCellule = absCurseur * TAILLE_CELLULE + TAILLE_CELLULE / 2 - TAILLE_CELLULE / 4 - 1;
+  gb.display.fillCircle(xCellule + TAILLE_CELLULE / 2 - 1, DECALAGE_GRILLE_Y - TAILLE_CELLULE / 2 - 1, TAILLE_CELLULE / 2 - 2);
 }
 
 
+
 int verifierPuissance4(int joueur) {
-  // Vérifier les puissances 4 horizontales
+  //puissances 4 horizontales
   for (int i = 0; i < LIGNES_GRILLE; i++) {
     for (int j = 0; j < COLONNES_GRILLE - 3; j++) {
       if (grillePions[i][j] == joueur && grillePions[i][j + 1] == joueur && grillePions[i][j + 2] == joueur && grillePions[i][j + 3] == joueur) {
@@ -287,7 +262,7 @@ int verifierPuissance4(int joueur) {
     }
   }
 
-  // Vérifier les puissances 4 verticales
+  //puissances 4 verticales
   for (int i = 0; i < LIGNES_GRILLE - 3; i++) {
     for (int j = 0; j < COLONNES_GRILLE; j++) {
       if (grillePions[i][j] == joueur && grillePions[i + 1][j] == joueur && grillePions[i + 2][j] == joueur && grillePions[i + 3][j] == joueur) {
@@ -296,7 +271,7 @@ int verifierPuissance4(int joueur) {
     }
   }
 
-  // Vérifier les puissances 4 diagonales bas droite (\)
+  //puissances 4 diagonales bas droite
   for (int i = 0; i < LIGNES_GRILLE - 3; i++) {
     for (int j = 0; j < COLONNES_GRILLE - 3; j++) {
       if (grillePions[i][j] == joueur && grillePions[i + 1][j + 1] == joueur && grillePions[i + 2][j + 2] == joueur && grillePions[i + 3][j + 3] == joueur) {
@@ -305,7 +280,7 @@ int verifierPuissance4(int joueur) {
     }
   }
 
-  // Vérifier les puissances 4 diagonales haut droite (/)
+  //puissances 4 diagonales haut droite
   for (int i = 0; i < LIGNES_GRILLE - 3; i++) {
     for (int j = 3; j < COLONNES_GRILLE; j++) {
       if (grillePions[i][j] == joueur && grillePions[i + 1][j - 1] == joueur && grillePions[i + 2][j - 2] == joueur && grillePions[i + 3][j - 3] == joueur) {
@@ -314,7 +289,7 @@ int verifierPuissance4(int joueur) {
     }
   }
 
-  // Aucune puissance 4 trouvée
+  //aucun pattern trouve
   return 0;
 }
 
