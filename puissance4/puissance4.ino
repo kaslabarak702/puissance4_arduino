@@ -292,4 +292,3 @@ int verifierPuissance4(int joueur) {
   //aucun pattern trouve
   return 0;
 }
-
